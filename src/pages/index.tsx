@@ -1,5 +1,6 @@
-import { SignIn, SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import { SignIn, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
+
 
 const Home: NextPage = () => {
 
@@ -13,7 +14,7 @@ const Home: NextPage = () => {
           <div className="h-1/6">
             {!!user.isSignedIn && <SignOutButton>
               <button className="absolute top-10 right-10 bg-green-600 text-slate-100 py-2 px-4 rounded-md font-medium hover:bg-green-700">
-                Sign Out
+                sign out
               </button>
               </SignOutButton>}
             <SignIn path="/sign-in" routing="path" />
@@ -25,19 +26,19 @@ const Home: NextPage = () => {
             <h1 className="font-mono text-4xl font-extrabold leading-none text-center tracking-tight text-green-600 md:text-5xl drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.4)]">cauldron</h1>
           </div>
           <div className="flex justify-center">
-            <button className="inline-flex items-center px-4 py-2 bg-slate-400 hover:bg-slate-800 text-white font-medium rounded-md shadow-md mt-8">
-              what is cauldron?
-            </button>
+            <p className="items-center text-white font-medium mt-4">
+              blend two tracks to discover new music
+            </p>
           </div>
           <form className="flex justify-center w-full">
             <section className="flex justify-center w-full">
               <div className="p-16 w-1/2">
-                <label className="flex block justify-center font-medium text-slate-100">First Track</label>
-                <input type="search" id="track1" className="block justify-center mt-2 w-full rounded-lg px-3 py-4 outline-none shadow" placeholder="Enter first track title..."/>
+                <label className="flex block justify-center font-medium text-slate-100">first track</label>
+                <input type="search" id="track1" className="block justify-center mt-2 w-full rounded-lg px-3 py-4 outline-none shadow" placeholder="enter first track title..."/>
               </div>
               <div className="p-16 w-1/2">
-                <label className="block flex justify-center font-medium text-slate-100">Second Track</label>
-                <input type="search" id="track2" className="block flex justify-center mt-2 w-full rounded-lg px-3 py-4 outline-none shadow" placeholder="Enter second track title..."/>
+                <label className="block flex justify-center font-medium text-slate-100">second track</label>
+                <input type="search" id="track2" className="block flex justify-center mt-2 w-full rounded-lg px-3 py-4 outline-none shadow" placeholder="enter second track title..."/>
               </div>
             </section>
           </form>
