@@ -9,16 +9,32 @@ const Home: NextPage = () => {
   const [bearerToken, setBearerToken] = useState('');
   const [recommendations, setRecommendations] = useState([]);
   const [artistIDs, setArtistIDs] = useState({});
+
+  useEffect(() => {
+    const fetchSpotifyToken = async () => {
+      try {
+        const bearerTokenResponse = await fetch('/api/spotify-token');
+        const { token } = await bearerTokenResponse.json();
+        setBearerToken(token);
+
+        if (bearerTokenResponse.ok) {
+          setBearerToken(token);
+        } else {
+          console.error('Failed to retrieve Spotify bearer token');
+        }
+      } catch (error) {
+        console.error('Error occurred while fetching Spotify bearer token:', error);
+      }
+    };
+
+    fetchSpotifyToken();
+  }, []);
   
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const bearerTokenResponse = await fetch('/api/spotify-token');
-      const { token } = await bearerTokenResponse.json();
-      setBearerToken(token);
-
       const idResponse = await fetch(`/api/artist-ids?firstArtist=${firstArtist}&secondArtist=${secondArtist}`, {
         headers: { Authorization: `Bearer ${bearerToken}` },
       });
@@ -26,12 +42,16 @@ const Home: NextPage = () => {
       const { artistID1, artistID2 } = await idResponse.json();
       setArtistIDs({  artistID1, artistID2 });
 
+      console.log(artistIDs);
+
       const recommendationResponse = await fetch(`/api/get-recommendations?artistID1=${artistID1}&artistID2=${artistID2}`, {
         headers: { Authorization: `Bearer ${bearerToken}` },
       });
 
       const { recommendations } = await recommendationResponse.json();
       setRecommendations(recommendations);
+
+      return recommendations;
     } catch (error) {
       console.error('Error:', error);
     }
@@ -53,7 +73,7 @@ const Home: NextPage = () => {
               blend two artists to discover new music
             </p>
           </div>
-          <form className="relative justify-center w-full">
+          <form onSubmit={handleSubmit} className="relative justify-center w-full">
             <section className="flex justify-center w-full">
                 <div className="p-16 w-1/4">
                     <label className="flex block justify-center font-medium text-slate-100">first artist</label>
@@ -65,7 +85,7 @@ const Home: NextPage = () => {
                 </div>
             </section>
             <div className="flex justify-center">
-                <button onClick={handleSubmit} type="submit" className="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-md">
+                <button  type="submit" className="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-md">
                     blend
                 </button>
             </div>
