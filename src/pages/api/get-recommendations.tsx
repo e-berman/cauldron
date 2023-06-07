@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 const getRecommendations = async (bearerToken: string, artistID1: string, artistID2: string) => {
     const response = await fetch(

@@ -42,7 +42,7 @@ const Home: NextPage = () => {
       const { artistID1, artistID2 } = await idResponse.json();
       setArtistIDs({  artistID1, artistID2 });
 
-      console.log(artistIDs);
+      // console.log(artistIDs);
 
       const recommendationResponse = await fetch(`/api/get-recommendations?artistID1=${artistID1}&artistID2=${artistID2}`, {
         headers: { Authorization: `Bearer ${bearerToken}` },
