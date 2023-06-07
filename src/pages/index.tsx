@@ -1,20 +1,35 @@
 //import { SignIn, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import { useState, useEffect } from "react";
+import { type SpotifyAlbum } from "~/interfaces/SpotifyAlbum";
+
+interface BearerTokenResponse {
+  token: string,
+}
+
+interface ArtistIDResponse {
+  artistID1: string,
+  artistID2: string,
+}
+
+interface Recommendations {
+  tracks: SpotifyAlbum[],
+}
 
 const Home: NextPage = () => {
 
   const [firstArtist, setFirstArtist] = useState('');
   const [secondArtist, setSecondArtist] = useState('');
   const [bearerToken, setBearerToken] = useState('');
-  const [recommendations, setRecommendations] = useState([]);
-  const [artistIDs, setArtistIDs] = useState({});
+
+  const initialData: SpotifyAlbum[] = [];
+  const [tracks, setTracks] = useState<SpotifyAlbum[]>(initialData);
 
   useEffect(() => {
     const fetchSpotifyToken = async () => {
       try {
         const bearerTokenResponse = await fetch('/api/spotify-token');
-        const { token } = await bearerTokenResponse.json();
+        const { token } = await bearerTokenResponse.json() as BearerTokenResponse;
         setBearerToken(token);
 
         if (bearerTokenResponse.ok) {
@@ -27,7 +42,14 @@ const Home: NextPage = () => {
       }
     };
 
-    fetchSpotifyToken();
+    fetchSpotifyToken()
+    .then(() => {
+      console.log("Bearer Token retrieved");
+    })
+    .catch((error) => {
+      console.error('Error occurred while fetching Spotify bearer token:', error);
+    });
+
   }, []);
   
 
@@ -39,19 +61,14 @@ const Home: NextPage = () => {
         headers: { Authorization: `Bearer ${bearerToken}` },
       });
 
-      const { artistID1, artistID2 } = await idResponse.json();
-      setArtistIDs({  artistID1, artistID2 });
+      const { artistID1, artistID2 } = await idResponse.json() as ArtistIDResponse;
 
-      // console.log(artistIDs);
-
-      const recommendationResponse = await fetch(`/api/get-recommendations?artistID1=${artistID1}&artistID2=${artistID2}`, {
+      const recResponse = await fetch(`/api/get-recommendations?artistID1=${artistID1}&artistID2=${artistID2}`, {
         headers: { Authorization: `Bearer ${bearerToken}` },
       });
 
-      const { recommendations } = await recommendationResponse.json();
-      setRecommendations(recommendations);
-
-      return recommendations;
+      const { tracks } = await recResponse.json() as Recommendations;
+      setTracks(tracks);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -91,14 +108,14 @@ const Home: NextPage = () => {
             </div>
           </form>
           <div className="flex justify-center">
-          {recommendations && recommendations.length > 0 && (
+          {tracks && tracks.length > 0 && (
             <div className="p-10">
-              <h2 className="text-xl font-bold mb-4 flex justify-center text-slate-100">recommended tracks:</h2>
+              <h2 className="text-xl font-bold mb-4 flex justify-center text-slate-100">similar tracks:</h2>
               <ul className="grid grid-cols-2 gap-4 bg-slate-100 p-4 rounded-lg ml-4">
-                {recommendations.map((track: any) => (
-                  <li key={track.id} className="py-2 text-slate-100">
+                {tracks.map((track: SpotifyAlbum) => (
+                  <li key={track.id} className="border border-slate-300 py-2 px-2 text-slate-100 bg-slate-200 rounded-md">
                     <a href={track.external_urls.spotify} className="text-blue-500 font-bold hover:underline">
-                      {track.artists[0].name} - {track.name} 
+                      {track.artists[0]?.name} - {track.name} 
                     </a>
                   </li>
                 ))}

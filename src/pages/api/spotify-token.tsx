@@ -20,7 +20,6 @@ const getBearerToken = async () => {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: `Basic ${b64Auth}`,
-        'Access-Control-Allow-Origin': '*',
       },
       body: 'grant_type=client_credentials',
     });

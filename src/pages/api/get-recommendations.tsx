@@ -1,4 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { type SpotifyAlbum } from "~/interfaces/SpotifyAlbum";
+
+interface Recommendations {
+  tracks: SpotifyAlbum[]
+}
 
 const getRecommendations = async (bearerToken: string, artistID1: string, artistID2: string) => {
     const response = await fetch(
@@ -7,12 +12,11 @@ const getRecommendations = async (bearerToken: string, artistID1: string, artist
         headers: {
           Authorization: `Bearer ${bearerToken}`,
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
         },
       }
     );
 
-    const data = await response.json();
+    const data = await response.json() as Recommendations;
     return data.tracks;
 };
 
@@ -21,13 +25,13 @@ export default async function handler (req: NextApiRequest, res: NextApiResponse
     const { artistID1, artistID2 } = req.query;
     const bearerToken = req.headers.authorization?.replace('Bearer ', '');
 
-    const recommendations = await getRecommendations(
+    const tracks = await getRecommendations(
       bearerToken as string,
       artistID1 as string,
       artistID2 as string
     );
 
-    res.status(200).json({ recommendations });
+    res.status(200).json({ tracks });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch recommendations' });
   }

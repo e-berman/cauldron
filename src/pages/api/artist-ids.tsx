@@ -39,7 +39,6 @@ const getArtistID = async (bearerToken: string, artistName: string) => {
       headers: {
         Authorization: `Bearer ${bearerToken}`,
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
       },
     });
 
