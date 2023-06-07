@@ -7,10 +7,10 @@ await import("./src/env.mjs");
 /** @type {import("next").NextConfig} */
 const config = {
 
-  // eslint: {
-  //   ignoreDuringBuilds: true,
-  // },
-  // reactStrictMode: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  reactStrictMode: true,
 
   /**
    * If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config
