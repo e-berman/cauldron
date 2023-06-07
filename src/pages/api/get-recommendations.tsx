@@ -1,9 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { type SpotifyAlbum } from "~/interfaces/SpotifyAlbum";
-
-interface Recommendations {
-  tracks: SpotifyAlbum[]
-}
+import { type Recommendations } from "~/interfaces/Recommendations";
 
 const getRecommendations = async (bearerToken: string, artistID1: string, artistID2: string) => {
     const response = await fetch(

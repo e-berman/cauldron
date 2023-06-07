@@ -1,7 +1,7 @@
-//import { SignIn, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import { useState, useEffect } from "react";
 import { type SpotifyAlbum } from "~/interfaces/SpotifyAlbum";
+import { type Recommendations } from "~/interfaces/Recommendations";
 
 interface BearerTokenResponse {
   token: string,
@@ -10,10 +10,6 @@ interface BearerTokenResponse {
 interface ArtistIDResponse {
   artistID1: string,
   artistID2: string,
-}
-
-interface Recommendations {
-  tracks: SpotifyAlbum[],
 }
 
 const Home: NextPage = () => {
