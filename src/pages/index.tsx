@@ -2,6 +2,7 @@ import { type NextPage } from "next";
 import { useState, useEffect } from "react";
 import { type SpotifyAlbum } from "~/interfaces/SpotifyAlbum";
 import { type Recommendations } from "~/interfaces/Recommendations";
+import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 
 interface BearerTokenResponse {
   token: string,
@@ -20,6 +21,8 @@ const Home: NextPage = () => {
 
   const initialData: SpotifyAlbum[] = [];
   const [tracks, setTracks] = useState<SpotifyAlbum[]>(initialData);
+
+  const user = useUser();
 
   useEffect(() => {
     const fetchSpotifyToken = async () => {
@@ -47,10 +50,11 @@ const Home: NextPage = () => {
     });
 
   }, []);
-  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    console.log(user.user?.fullName);
 
     try {
       const idResponse = await fetch(`/api/artist-ids?firstArtist=${firstArtist}&secondArtist=${secondArtist}`, {
@@ -75,6 +79,16 @@ const Home: NextPage = () => {
       <main className="flex justify-center h-screen bg-gradient-to-t from-emerald-900 via-slate-800 to-slate-900 bg-scroll-color">
         <title>Cauldron</title>
         <div className="w-full mt-8">
+          {!user.isSignedIn && <SignInButton>
+            <button  type="submit" className="justify-right items-center ml-8 px-8 py-4 bg-slate-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-md">
+              sign in
+            </button>
+          </SignInButton>}
+          {!!user.isSignedIn && <SignOutButton>
+            <button  type="submit" className="justify-right items-center ml-8 px-8 py-4 bg-slate-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-md">
+              sign out
+            </button>
+          </SignOutButton>}
           <div className="flex justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-6 h-6 fill-green-600">
               <path fill-rule="evenodd" d="M10.5 3.798v5.02a3 3 0 01-.879 2.121l-2.377 2.377a9.845 9.845 0 015.091 1.013 8.315 8.315 0 005.713.636l.285-.071-3.954-3.955a3 3 0 01-.879-2.121v-5.02a23.614 23.614 0 00-3 0zm4.5.138a.75.75 0 00.093-1.495A24.837 24.837 0 0012 2.25a25.048 25.048 0 00-3.093.191A.75.75 0 009 3.936v4.882a1.5 1.5 0 01-.44 1.06l-6.293 6.294c-1.62 1.621-.903 4.475 1.471 4.88 2.686.46 5.447.698 8.262.698 2.816 0 5.576-.239 8.262-.697 2.373-.406 3.092-3.26 1.47-4.881L15.44 9.879A1.5 1.5 0 0115 8.818V3.936z" clip-rule="evenodd" />
@@ -98,9 +112,9 @@ const Home: NextPage = () => {
                 </div>
             </section>
             <div className="flex justify-center">
-                <button  type="submit" className="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-md">
-                    blend
-                </button>
+              <button  type="submit" className="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-md">
+                  blend
+              </button>
             </div>
           </form>
           <div className="flex justify-center">
