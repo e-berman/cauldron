@@ -54,6 +54,27 @@ const Home: NextPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    try {
+      const idResponse = await fetch(`/api/artist-ids?firstArtist=${firstArtist}&secondArtist=${secondArtist}`, {
+        headers: { Authorization: `Bearer ${bearerToken}` },
+      });
+
+      const { artistID1, artistID2 } = await idResponse.json() as ArtistIDResponse;
+
+      const recResponse = await fetch(`/api/get-recommendations?artistID1=${artistID1}&artistID2=${artistID2}`, {
+        headers: { Authorization: `Bearer ${bearerToken}` },
+      });
+
+      const { tracks } = await recResponse.json() as Recommendations;
+      setTracks(tracks);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleCreatePlaylist = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     console.log(user.user?.fullName);
 
     try {
@@ -76,11 +97,11 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <main className="flex justify-center h-screen bg-gradient-to-t from-emerald-900 via-slate-800 to-slate-900 bg-scroll-color">
+      <main className="min-h-screen flex flex-col bg-gradient-to-t from-emerald-900 via-slate-800 to-slate-900 bg-scroll-color">
         <title>Cauldron</title>
         <div className="w-full mt-8">
           {!user.isSignedIn && <SignInButton>
-            <button  type="submit" className="justify-right items-center ml-8 px-8 py-4 bg-slate-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-md">
+            <button type="submit" className="justify-right items-center ml-8 px-8 py-4 bg-slate-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-md">
               sign in
             </button>
           </SignInButton>}
@@ -104,24 +125,24 @@ const Home: NextPage = () => {
             <section className="flex justify-center w-full">
                 <div className="p-16 w-1/4">
                     <label className="flex block justify-center font-medium text-slate-100">first artist</label>
-                    <input type="text" value={firstArtist} onChange={(e) => setFirstArtist(e.target.value)} id="track1" className="block justify-center mt-2 w-full rounded-lg px-3 py-4 outline-none shadow" placeholder="enter first artist..."/>
+                    <input type="text" value={firstArtist} onChange={(e) => setFirstArtist(e.target.value)} id="track1" required className="block justify-center mt-2 w-full rounded-lg px-3 py-4 outline-none shadow" placeholder="enter first artist..."/>
                 </div>
                 <div className="p-16 w-1/4">
                     <label className="block flex justify-center font-medium text-slate-100">second artist</label>
-                    <input type="text" value={secondArtist} onChange={(e) => setSecondArtist(e.target.value)} id="track2" className="block flex justify-center mt-2 w-full rounded-lg px-3 py-4 outline-none shadow" placeholder="enter second artist..."/>
+                    <input type="text" value={secondArtist} onChange={(e) => setSecondArtist(e.target.value)} id="track2" required className="block flex justify-center mt-2 w-full rounded-lg px-3 py-4 outline-none shadow" placeholder="enter second artist..."/>
                 </div>
             </section>
             <div className="flex justify-center">
-              <button  type="submit" className="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-md">
-                  blend
+              <button type="submit" className="px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-md">
+                blend
               </button>
             </div>
           </form>
           <div className="flex justify-center">
           {tracks && tracks.length > 0 && (
-            <div className="p-10">
+            <div className="flex-col p-10">
               <h2 className="text-xl font-bold mb-4 flex justify-center text-slate-100">similar tracks:</h2>
-              <ul className="grid grid-cols-2 gap-4 bg-slate-100 p-4 rounded-lg ml-4">
+              <ul className="grid grid-cols-2 gap-4 bg-slate-100 p-4 rounded-lg">
                 {tracks.map((track: SpotifyAlbum) => (
                   <li key={track.id} className="border border-slate-300 py-2 px-2 text-slate-100 bg-slate-200 rounded-md">
                     <a href={track.external_urls.spotify} className="text-blue-500 font-bold hover:underline">
@@ -130,6 +151,11 @@ const Home: NextPage = () => {
                   </li>
                 ))}
               </ul>
+              <div className="flex justify-center">
+                <button type="submit" className="justify-center mt-4 px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-md">
+                  create playlist
+                </button>
+              </div>
             </div>
           )}
           </div>
