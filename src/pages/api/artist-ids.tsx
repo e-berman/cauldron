@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { type ArtistSearch } from "~/interfaces/ArtistSeach";
+import { type ArtistSearch } from "~/interfaces/ArtistSearch";
 
 
 const getArtistID = async (bearerToken: string, artistName: string) => {
