@@ -1,37 +1,34 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 interface TokenResponseObject {
-  access_token: string,
-  token_type: string,
-  expires_in: number,
+  object: string,
+  token: string,
+  provider: string,
 }
 
-const getBearerToken = async () => {
-  const SPOTIFY_CLIENT_ID: string | undefined = process.env.SPOTIFY_CLIENT_ID;
-  const SPOTIFY_CLIENT_SECRET: string | undefined = process.env.SPOTIFY_CLIENT_SECRET;
+const getBearerToken = async (userID: string, provider: string) => {
+  const BACKEND_API_KEY: string | undefined = process.env.BACKEND_API_KEY;
 
-  if (SPOTIFY_CLIENT_ID === undefined || SPOTIFY_CLIENT_SECRET === undefined) {
-    console.error("Spotify credentials are undefined");
+  if (!BACKEND_API_KEY) {
+    console.warn("Missing API Key")
   } else {
-    const b64Auth: string = Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64');
-
-    const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {
-      method: 'POST',
+    const accessTokenResponse = await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(userID)}/oauth_access_tokens/${encodeURIComponent(provider)}`, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Basic ${b64Auth}`,
-      },
-      body: 'grant_type=client_credentials',
+        Authorization: `Bearer ${BACKEND_API_KEY}`
+      }
     });
 
-    const data = await tokenResponse.json() as TokenResponseObject;
-    return data.access_token;
+    const data = await accessTokenResponse.json() as TokenResponseObject[];
+
+    return data[0]?.token;
   }
 };
 
 export default async function handler (req: NextApiRequest, res: NextApiResponse) {
   try {
-    const token: string | undefined = await getBearerToken();
+    const { userID, provider } = req.query;
+    const token: string | undefined = await getBearerToken(userID as string, provider as string);
+    //console.log(token)
     res.status(200).json({ token });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch bearer token' });

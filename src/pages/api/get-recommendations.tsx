@@ -13,6 +13,9 @@ const getRecommendations = async (bearerToken: string, artistID1: string, artist
     );
 
     const data = await response.json() as Recommendations;
+    
+    //console.log(data.tracks)
+
     return data.tracks;
 };
 
