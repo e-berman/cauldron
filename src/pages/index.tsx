@@ -52,6 +52,8 @@ const Home: NextPage = () => {
         .catch((error) => {
           console.error('Error occurred while fetching Spotify bearer token:', error);
         });
+
+        console.log(bearerToken)
       }
   }, [user.isSignedIn, userID, provider]);
 
@@ -71,6 +73,8 @@ const Home: NextPage = () => {
 
       const { tracks } = await recResponse.json() as Recommendations;
       setTracks(tracks);
+
+      console.log(tracks)
     } catch (error) {
       console.error('Error:', error);
     }
