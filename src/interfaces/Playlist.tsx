@@ -27,7 +27,7 @@ export interface Playlist {
     snapshot_id: string;
     tracks: {
       href: string;
-      items: never[]; // You can replace 'any' with a more specific type for the 'items' array if you have information about its structure.
+      items: never[];
       limit: number;
       next: string | null;
       offset: number;
