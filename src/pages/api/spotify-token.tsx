@@ -60,7 +60,6 @@ export default async function handler (req: NextApiRequest, res: NextApiResponse
 
     if (!userID || !provider) {
       const token: string = await getBearerTokenGeneric() ?? '';
-      console.log(token)
       res.status(200).json({ token });
     } else {
       const token: string = await getBearerTokenPermissions(userID as string, provider as string) ?? '';
