@@ -15,48 +15,56 @@ interface ArtistIDResponse {
 
 const Home: NextPage = () => {
 
-  const [firstArtist, setFirstArtist] = useState('');
-  const [secondArtist, setSecondArtist] = useState('');
-  const [bearerToken, setBearerToken] = useState('');
-  const [playlist, setPlaylist] = useState('');
+  const [firstArtist, setFirstArtist] = useState<string>('');
+  const [secondArtist, setSecondArtist] = useState<string>('');
+  const [bearerToken, setBearerToken] = useState<string>('');
+  const [playlist, setPlaylist] = useState<string>('');
+  const [playlistStatus, setPlaylistStatus] = useState<boolean>(false);
 
   const initialData: SpotifyAlbum[] = [];
   const [tracks, setTracks] = useState<SpotifyAlbum[]>(initialData);
 
   const user = useUser();
-  const userID = user.user?.id;
-  const provider = user.user?.externalAccounts[0]?.verification?.strategy;
+  const userID = user.user?.id ?? '';
+  const provider = user.user?.externalAccounts[0]?.verification?.strategy ?? '';
 
   useEffect(() => {
-      const fetchSpotifyToken = async () => {
-        try {
-          if (!userID || !provider) {
-            console.error("Unable to retrieve spotify user id or provider");
-          } else {
-            const bearerTokenResponse = await fetch(`/api/spotify-token?userID=${userID}&provider=${provider}`);
-            const { token } = await bearerTokenResponse.json() as BearerTokenResponse;
-      
-            if (bearerTokenResponse.ok) {
-              setBearerToken(token);
-            } else {
-              console.error('Failed to retrieve Spotify bearer token');
-            }
-          }
-        } catch (error) {
-          console.error('Error occurred while fetching Spotify bearer token:', error);
+    const fetchSpotifyToken = async () => {
+      try {
+        const bearerTokenResponse = await fetch(`/api/spotify-token?userID=${userID}&provider=${provider}`);
+        const { token } = await bearerTokenResponse.json() as BearerTokenResponse;
+  
+        if (bearerTokenResponse.ok) {
+          return token;
+        } else {
+          console.error('Failed to retrieve Spotify bearer token');
         }
-      };
-
-      if (user.isSignedIn) {
-        fetchSpotifyToken()
-        .catch((error) => {
-          console.error('Error occurred while fetching Spotify bearer token:', error);
-        });
+      } catch (error) {
+        console.error('Error occurred while fetching Spotify bearer token:', error);
       }
-  }, [user.isSignedIn, userID, provider]);
+    };
+
+    if (!bearerToken || (!!bearerToken && user.isSignedIn)) {
+      fetchSpotifyToken()
+      .then((token) => {
+        if (!token) {
+          console.error("Invalid token");
+        } else {
+          setBearerToken(token)
+        }
+      })
+      .catch((error) => {
+        console.error('Error occurred while fetching Spotify bearer token:', error);
+      });
+    }
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!!playlistStatus) {
+      setPlaylistStatus(false)
+    }
 
     try {
       const idResponse = await fetch(`/api/artist-ids?firstArtist=${firstArtist}&secondArtist=${secondArtist}`, {
@@ -117,12 +125,12 @@ const Home: NextPage = () => {
         <div className="w-full mt-8">
           <div className="flex justify-end mr-16">
             {!user.isSignedIn && <SignInButton>
-              <button type="submit" className="items-center ml-8 px-8 py-4 bg-slate-400 hover:bg-blue-700 text-white font-medium rounded-md shadow-md">
+              <button type="submit" className="items-center ml-8 px-8 py-4 bg-blue-700 hover:bg-blue-600 text-white font-medium rounded-md shadow-md">
                 sign in
               </button>
             </SignInButton>}
             {!!user.isSignedIn && <SignOutButton>
-              <button  type="submit" className="items-center ml-8 px-8 py-4 bg-slate-400 hover:bg-blue-700 text-white font-medium rounded-md shadow-md">
+              <button  type="submit" className="items-center ml-8 px-8 py-4 bg-blue-700 hover:bg-blue-600 text-white font-medium rounded-md shadow-md">
                 sign out
               </button>
             </SignOutButton>}
@@ -150,7 +158,7 @@ const Home: NextPage = () => {
                 </div>
             </section>
             <div className="flex justify-center mb-8">
-              <button type="submit" className="px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-md">
+              <button type="submit" className="px-8 py-4 bg-green-700 hover:bg-green-600 text-white font-medium rounded-md shadow-md">
                 blend
               </button>
             </div>
@@ -168,12 +176,26 @@ const Home: NextPage = () => {
                   </li>
                 ))}
               </ul>
-              <form onSubmit={handleCreatePlaylist} className="flex justify-center">
-                <input type="text" value={playlist} onChange={(e) => setPlaylist(e.target.value)} id="playlist" required className="block justify-center mt-4 rounded-md px-1 py-2 outline-none shadow" placeholder="enter playlist name..."/>
-                <button type="submit" className="justify-center mt-4 ml-1 px-2 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-md">
-                  create playlist
-                </button>
-              </form>
+              {!user.isSignedIn && (
+                <div className="flex justify-center mt-4">
+                  <p className="flex justify-center px-8 py-4 bg-slate-400 text-white font-medium rounded-md shadow-md">
+                    sign in to create a playlist
+                  </p>
+                </div>
+              )}
+              {playlistStatus && (
+                <div className="flex justify-center">
+                  <p className="text-white mt-4">playlist created</p>
+                </div>
+              )}
+              {!!user.isSignedIn && (
+                <form onSubmit={handleCreatePlaylist} className="flex justify-center">
+                  <input type="text" value={playlist} onChange={(e) => setPlaylist(e.target.value)} id="playlist" required className="block justify-center mt-4 rounded-md px-1 py-2 outline-none shadow" placeholder="enter playlist name..."/>
+                  <button type="submit" onClick={() => setPlaylistStatus(true)} className="justify-center mt-4 ml-1 px-2 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-md">
+                    create playlist
+                  </button>
+                </form>
+              )}
             </div>
           )}
           </div>
