@@ -166,14 +166,17 @@ const Home: NextPage = () => {
           <div className="flex justify-center">
           {tracks && tracks.length > 0 && (
             <div className="flex-col p-16">
-              <h2 className="text-xl font-bold mb-4 flex justify-center text-slate-100">similar tracks</h2>
-              <ul className="grid grid-cols-2 gap-4 bg-slate-400 p-4 rounded-lg">
+              {/* <h2 className="text-xl font-bold mb-4 flex justify-center text-slate-100">similar tracks</h2> */}
+              <ul className="grid grid-flow-dense grid-cols-2 gap-4 p-4 rounded-lg">
                 {tracks.map((track: SpotifyAlbum) => (
-                  <li key={track.id} className="border border-slate-500 py-2 px-2 text-slate-100 bg-slate-200 rounded-md">
-                    <a href={track.external_urls.spotify} className="text-blue-500 font-bold hover:underline">
+                  <li key={track.id} className="flex grid grid-cols-3 border border-slate-800 py-2 px-2 text-slate-100 bg-slate-400 rounded-md">
+                    <div className="flex justify-center">
+                      <img className="rounded-md" src={track.album.images[0]?.url} alt={track.album.name} width="100" height="100"/>  
+                    </div>
+                    <a href={track.external_urls.spotify} className="flex items-center col-span-2 text-blue-700 font-extrabold hover:underline hover:underline-offset-4 hover:text-blue-600">
                       {track.artists[0]?.name} - {track.name} 
                     </a>
-                  </li>
+                </li>
                 ))}
               </ul>
               {!user.isSignedIn && (
@@ -191,7 +194,7 @@ const Home: NextPage = () => {
               {!!user.isSignedIn && (
                 <form onSubmit={handleCreatePlaylist} className="flex justify-center">
                   <input type="text" value={playlist} onChange={(e) => setPlaylist(e.target.value)} id="playlist" required className="block justify-center mt-4 rounded-md px-1 py-2 outline-none shadow" placeholder="enter playlist name..."/>
-                  <button type="submit" onClick={() => setPlaylistStatus(true)} className="justify-center mt-4 ml-1 px-2 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-md">
+                  <button type="submit" onClick={() => setPlaylistStatus(true)} className="justify-center mt-4 ml-1 px-2 py-2 bg-green-700 hover:bg-green-600 text-white font-medium rounded-md shadow-md">
                     create playlist
                   </button>
                 </form>
