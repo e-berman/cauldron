@@ -166,7 +166,6 @@ const Home: NextPage = () => {
           <div className="flex justify-center">
           {tracks && tracks.length > 0 && (
             <div className="flex-col p-16">
-              {/* <h2 className="text-xl font-bold mb-4 flex justify-center text-slate-100">similar tracks</h2> */}
               <ul className="grid grid-flow-dense grid-cols-2 gap-4 p-4 rounded-lg">
                 {tracks.map((track: SpotifyAlbum) => (
                   <li key={track.id} className="flex grid grid-cols-3 border border-slate-800 py-2 px-2 text-slate-100 bg-slate-400 rounded-md">
