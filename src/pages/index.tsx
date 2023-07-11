@@ -20,6 +20,10 @@ const Home: NextPage = () => {
   const [bearerToken, setBearerToken] = useState<string>('');
   const [playlist, setPlaylist] = useState<string>('');
   const [playlistStatus, setPlaylistStatus] = useState<boolean>(false);
+  const [catchyToggle, setCatchyToggle] = useState<boolean>(false);
+  const [upbeatToggle, setUpbeatToggle] = useState<boolean>(false);
+  const [danceabilityValueRange, setDanceabilityValueRange] = useState<number[]>([0.01,0.5]);
+  const [energyValueRange, setEnergyValueRange] = useState<number[]>([0.01,0.5]);
 
   const initialData: SpotifyAlbum[] = [];
   const [tracks, setTracks] = useState<SpotifyAlbum[]>(initialData);
@@ -73,8 +77,18 @@ const Home: NextPage = () => {
 
       const { artistID1, artistID2 } = await idResponse.json() as ArtistIDResponse;
 
-      const recResponse = await fetch(`/api/get-recommendations?artistID1=${artistID1}&artistID2=${artistID2}`, {
-        headers: { Authorization: `Bearer ${bearerToken}` },
+      const recResponse = await fetch(
+        `/api/get-recommendations?artistID1=${artistID1}&artistID2=${artistID2}`,
+      {
+        method: 'POST',
+        headers: { 
+          Authorization: `Bearer ${bearerToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          danceabilityValueRange,
+          energyValueRange,
+        }),
       });
 
       const { tracks } = await recResponse.json() as Recommendations;
@@ -105,6 +119,22 @@ const Home: NextPage = () => {
       }
     } catch (error) {
       console.error('Error:', error);
+    }
+  };
+
+  const handleCatchyToggle = () => {
+    if (!catchyToggle) {
+      setDanceabilityValueRange([0.5,1]);
+    } else {
+      setDanceabilityValueRange([0.01,0.5])
+    }
+  };
+
+  const handleUpbeatToggle = () => {
+    if (!upbeatToggle) {
+      setEnergyValueRange([0.5,1]);
+    } else {
+      setEnergyValueRange([0.01,0.5])
     }
   };
 
@@ -147,17 +177,33 @@ const Home: NextPage = () => {
             </p>
           </div>
           <form onSubmit={handleSubmit} className="relative justify-center w-full">
-            <section className="flex justify-center w-full">
-                <div className="mt-24 mx-14 mb-8 w-1/6">
+            <section className="flex justify-center w-full gap-8">
+                <div className="mt-24 mb-8 w-1/6">
                     <label className="flex block justify-center font-medium text-slate-100">first artist</label>
                     <input type="text" value={firstArtist} onChange={(e) => setFirstArtist(e.target.value)} id="track1" required className="block justify-center mt-2 w-full rounded-lg px-3 py-4 outline-none shadow" placeholder="enter first artist..."/>
                 </div>
-                <div className="mt-24 mx-14 mb-8 w-1/6">
+                <div className="mt-24 mb-8 w-1/6">
                     <label className="block flex justify-center font-medium text-slate-100">second artist</label>
                     <input type="text" value={secondArtist} onChange={(e) => setSecondArtist(e.target.value)} id="track2" required className="block flex justify-center mt-2 w-full rounded-lg px-3 py-4 outline-none shadow" placeholder="enter second artist..."/>
                 </div>
             </section>
-            <div className="flex justify-center mb-8">
+            <section className="flex justify-center w-full gap-8">
+              <div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" value="" className="sr-only peer" checked={catchyToggle} onChange={() => {setCatchyToggle(!catchyToggle); handleCatchyToggle();}}/>
+                  <div className="w-14 h-7 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">catchy</span>
+                </label>
+              </div>
+              <div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" value="" className="sr-only peer" checked={upbeatToggle} onChange={() => {setUpbeatToggle(!upbeatToggle); handleUpbeatToggle();}}/>
+                  <div className="w-14 h-7 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">upbeat</span>
+                </label>
+              </div>
+            </section>
+            <div className="flex justify-center mb-8 mt-8">
               <button type="submit" className="px-8 py-4 bg-green-700 hover:bg-green-600 text-white font-medium rounded-md shadow-md">
                 blend
               </button>
@@ -166,7 +212,6 @@ const Home: NextPage = () => {
           <div className="flex justify-center">
           {tracks && tracks.length > 0 && (
             <div className="flex-col p-16">
-              {/* <h2 className="text-xl font-bold mb-4 flex justify-center text-slate-100">similar tracks</h2> */}
               <ul className="grid grid-flow-dense grid-cols-2 gap-4 p-4 rounded-lg">
                 {tracks.map((track: SpotifyAlbum) => (
                   <li key={track.id} className="flex grid grid-cols-3 border border-slate-800 py-2 px-2 text-slate-100 bg-slate-400 rounded-md">
