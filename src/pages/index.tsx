@@ -153,9 +153,9 @@ const Home: NextPage = () => {
       <main className="min-h-screen flex flex-col bg-gradient-to-t from-emerald-900 via-slate-800 to-slate-900 bg-scroll-color">
         <title>Cauldron</title>
         <div className="w-full mt-8">
-          <div className="flex justify-end mr-16">
+          <div className="flex justify-center md:justify-end md:mr-16 mb-8">
             {!user.isSignedIn && <SignInButton>
-              <button type="submit" className="items-center ml-8 px-8 py-4 bg-blue-700 hover:bg-blue-600 text-white font-medium rounded-md shadow-md">
+              <button type="submit" className="items-center md:ml-8 px-8 py-4 bg-blue-700 hover:bg-blue-600 text-white font-medium rounded-md shadow-md">
                 sign in
               </button>
             </SignInButton>}
@@ -178,11 +178,11 @@ const Home: NextPage = () => {
           </div>
           <form onSubmit={handleSubmit} className="relative justify-center w-full">
             <section className="flex justify-center w-full gap-8">
-                <div className="mt-24 mb-8 w-1/6">
+                <div className="mt-24 mb-8 lg:w-1/6 w-1/3">
                     <label className="flex block justify-center font-medium text-slate-100">first artist</label>
                     <input type="text" value={firstArtist} onChange={(e) => setFirstArtist(e.target.value)} id="track1" required className="block justify-center mt-2 w-full rounded-lg px-3 py-4 outline-none shadow" placeholder="enter first artist..."/>
                 </div>
-                <div className="mt-24 mb-8 w-1/6">
+                <div className="mt-24 mb-8 lg:w-1/6 w-1/3">
                     <label className="block flex justify-center font-medium text-slate-100">second artist</label>
                     <input type="text" value={secondArtist} onChange={(e) => setSecondArtist(e.target.value)} id="track2" required className="block flex justify-center mt-2 w-full rounded-lg px-3 py-4 outline-none shadow" placeholder="enter second artist..."/>
                 </div>
